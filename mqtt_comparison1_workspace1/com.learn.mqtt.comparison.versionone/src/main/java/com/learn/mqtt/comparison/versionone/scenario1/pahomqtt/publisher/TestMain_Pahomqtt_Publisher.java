@@ -70,27 +70,21 @@ public class TestMain_Pahomqtt_Publisher {
 	public static void main(String[] args) {
 
         int qos             = 0;
-
-        String brokerUri    = "tcp://localhost:1883";
-        String clientId     = "JavaSample";
-        
-        String myuserName	= "IamPublisherOne";
-        String mypwd		= "123456";
         
 		int statusUpdateMaxTimes = 50;
 		int statusUpdate = 0;
 
         try {
         	//MqttAsyncClient sampleClient = new MqttAsyncClient(brokerUri, clientId, new MqttDefaultFilePersistence());
-        	MqttClient sampleClient = new MqttClient(brokerUri, clientId, new MemoryPersistence());
+        	MqttClient sampleClient = new MqttClient("tcp://localhost:1883", "JavaSample", new MemoryPersistence());
         	
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
             connOpts.setCleanStart(true);
 
             // authentication
-            connOpts.setUserName(myuserName);
-            connOpts.setPassword(mypwd.getBytes());
+            connOpts.setUserName("IamPublisherOne");
+            connOpts.setPassword("123456".getBytes());
 
             // connect to broker
             sampleClient.connect(connOpts);											//如果是MqttClient 贼需要这个

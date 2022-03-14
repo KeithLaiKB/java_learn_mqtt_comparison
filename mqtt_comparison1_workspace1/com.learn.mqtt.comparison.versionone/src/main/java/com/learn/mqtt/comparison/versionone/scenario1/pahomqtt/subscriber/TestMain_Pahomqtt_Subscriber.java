@@ -1,7 +1,6 @@
 package com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.subscriber;
 
 
-import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,24 +40,17 @@ public class TestMain_Pahomqtt_Subscriber {
 	
 	private void run() {
 
-        String broker       = "tcp://localhost:1883";
-
-        
-        
-        String myuserName	= "IamPublisherOne";
-        String mypwd		= "123456";
-
         //final Logger LOGGER = LoggerFactory.getLogger(TestMain_Pahomqtt_Subscriber.class);
 
         try {
-            MqttClient sampleClient = new MqttClient(broker, this.clientId, new MemoryPersistence());		// create mqtt client
+            MqttClient sampleClient = new MqttClient("tcp://localhost:1883", this.clientId, new MemoryPersistence());		// create mqtt client
             //MqttClient sampleClient = new MqttClient(broker, clientId);
 
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
             // authentication
-            connOpts.setUserName(myuserName);
-            connOpts.setPassword(mypwd.getBytes());
+            connOpts.setUserName("IamPublisherOne");
+            connOpts.setPassword("123456".getBytes());
             
             connOpts.setCleanStart(true);
 
@@ -112,7 +104,6 @@ public class TestMain_Pahomqtt_Subscriber {
         } catch(MqttException me) {
             me.printStackTrace();
         } catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

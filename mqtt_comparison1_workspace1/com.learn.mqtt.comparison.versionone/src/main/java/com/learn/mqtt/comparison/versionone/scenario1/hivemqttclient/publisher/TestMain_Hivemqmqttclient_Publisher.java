@@ -37,42 +37,30 @@ public class TestMain_Hivemqmqttclient_Publisher {
 
 
 	public static void main(String[] args) {
-		
-        String topic        	= "Resource1";	// topic
-        MqttQos qos             = MqttQos.AT_MOST_ONCE;		// equals qos 0
-        String brokerAddress  	= "127.0.0.1";				// broker address
-        int brokerPort			= 1883;						// broker port
-        String clientId     	= "JavaSample_sender";		// client Id
-        String content     	 	= "Hello World!";
-        //
+
         int statusUpdate		=0;
         int statusUpdateMaxTimes=50;
-        //
-        
-        String myuserName	= "IamPublisherOne";
-        String mypwd		= "123456";
-        
+
         //------------------------------- create client --------------------------------------
-        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress(brokerAddress,brokerPort);
+        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("127.0.0.1",1883);
         // 所以初步认为 MqttAsyncClient 是包含了 MqttRxClient 
-        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username(myuserName).password(mypwd.getBytes()).build();
+        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(clientId).simpleAuth(simpleAuth).buildAsync();
+        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_sender").simpleAuth(simpleAuth).buildAsync();
         //------------------------------- client connect --------------------------------------
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);
 		//------------------------------- client publish --------------------------------------
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
-    	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic(topic);
-    	c1.qos(qos);
+    	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");
+    	c1.qos(MqttQos.AT_MOST_ONCE);
     	//
         while(statusUpdate<=statusUpdateMaxTimes-1) {
         	statusUpdate = statusUpdate+1;
-        	String str_content_tmp = content + statusUpdate;
-        	//
+        	String str_content_tmp = "Hello World!" + statusUpdate;
+
         	c1.payload(str_content_tmp.getBytes());
         	c1.send();
-        	//
-        	//System.out.println(str_content_tmp);
+
         	try {
         		Thread.sleep(500);
     		} catch (InterruptedException e) {

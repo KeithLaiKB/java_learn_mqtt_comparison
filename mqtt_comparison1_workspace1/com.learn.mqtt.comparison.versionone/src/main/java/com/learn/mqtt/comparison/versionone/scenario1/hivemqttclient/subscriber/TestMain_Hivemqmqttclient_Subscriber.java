@@ -16,9 +16,9 @@ import com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.subscriber.TestMa
 
 public class TestMain_Hivemqmqttclient_Subscriber {
     
-	private int expectedNumberOfMessages = 30;
-	private int numberOfMessages = 0;
-	private String clientId     			= "JavaSample_revcevier";
+	private int expectedNumberOfMessages 	= 30;
+	private int numberOfMessages 			= 0;
+	private String clientId     			= "JavaSample_revcevier";			//for testWithDifferentClients
 	
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
@@ -36,23 +36,15 @@ public class TestMain_Hivemqmqttclient_Subscriber {
     }
 
 	
-	private void run() {
-		
-        String brokerAddress  	= "127.0.0.1";				// broker address
-        int brokerPort			= 1883;						// broker port
-
-        String myuserName	= "IamPublisherOne";
-        String mypwd		= "123456";
-        
+	private void run() {  
         //------------------------------- create client --------------------------------------
-        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress(brokerAddress,brokerPort);;
-
-        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username(myuserName).password(mypwd.getBytes()).build();
+        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("127.0.0.1",1883);;
+        
+        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId).simpleAuth(simpleAuth).buildAsync();
         //------------------------------- client connect --------------------------------------
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);
-        
         //-------------------------------  to subscribe  --------------------------------------
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");
