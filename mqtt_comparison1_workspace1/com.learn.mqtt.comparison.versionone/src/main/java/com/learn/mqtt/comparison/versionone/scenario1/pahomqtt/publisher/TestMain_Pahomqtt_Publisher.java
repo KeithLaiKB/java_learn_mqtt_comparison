@@ -3,7 +3,6 @@ package com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.publisher;
 import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
-
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 /**
@@ -82,14 +81,14 @@ public class TestMain_Pahomqtt_Publisher {
             
             connOpts.setCleanStart(true);
 
-            // authentication
-            connOpts.setUserName("IamPublisherOne");
-            connOpts.setPassword("123456".getBytes());
+            
+            connOpts.setUserName("IamPublisherOne");								// authentication
+            connOpts.setPassword("123456".getBytes());								// authentication
 
             // connect to broker
             sampleClient.connect(connOpts);											//如果是MqttClient 贼需要这个
             //sampleClient.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
-            //
+            
             MqttMessage message_tmp=null;
             while(statusUpdate<=statusUpdateMaxTimes-1) {
             	statusUpdate= statusUpdate+1;

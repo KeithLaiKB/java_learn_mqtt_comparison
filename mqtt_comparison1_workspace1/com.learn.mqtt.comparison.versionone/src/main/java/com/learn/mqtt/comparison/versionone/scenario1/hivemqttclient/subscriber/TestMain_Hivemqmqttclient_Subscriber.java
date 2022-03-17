@@ -1,10 +1,7 @@
 package com.learn.mqtt.comparison.versionone.scenario1.hivemqttclient.subscriber;
 
 import java.net.InetSocketAddress;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
@@ -12,7 +9,6 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBu
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect;
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
-import com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.subscriber.TestMain_Pahomqtt_Subscriber;
 
 public class TestMain_Hivemqmqttclient_Subscriber {
     
@@ -37,18 +33,18 @@ public class TestMain_Hivemqmqttclient_Subscriber {
 
 	
 	private void run() {  
-        //------------------------------- create client --------------------------------------
-        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("127.0.0.1",1883);;
+
+        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("127.0.0.1",1883);																	// set broker address
         
-        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();
+        Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();								// authentication
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId).simpleAuth(simpleAuth).buildAsync();
-        //------------------------------- client connect --------------------------------------
-        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);
-        //-------------------------------  to subscribe  --------------------------------------
+        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId).simpleAuth(simpleAuth).buildAsync();		// create publisher
+        
+        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);						// subscriber connect
+       
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
-        Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");
-        c1.qos(MqttQos.AT_MOST_ONCE);
+        Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
+        c1.qos(MqttQos.AT_MOST_ONCE);																				// qos setting
         c1.callback(publish -> {
         			numberOfMessages = numberOfMessages +1;
         			System.out.println(new String(publish.getPayloadAsBytes())); 
@@ -60,7 +56,6 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         	try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
