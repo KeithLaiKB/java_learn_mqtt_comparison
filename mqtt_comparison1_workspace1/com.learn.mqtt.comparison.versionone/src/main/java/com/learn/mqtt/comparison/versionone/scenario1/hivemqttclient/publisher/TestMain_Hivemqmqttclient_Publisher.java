@@ -11,6 +11,7 @@ import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
 /**
  * 
+ * 
  * <p>
  * 							description:																				</br>	
  * &emsp;						qos 0																					</br>	
