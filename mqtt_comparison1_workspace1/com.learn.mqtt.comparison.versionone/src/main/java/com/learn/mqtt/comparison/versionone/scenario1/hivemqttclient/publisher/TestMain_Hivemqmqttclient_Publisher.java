@@ -1,6 +1,5 @@
 package com.learn.mqtt.comparison.versionone.scenario1.hivemqttclient.publisher;
 
-
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
