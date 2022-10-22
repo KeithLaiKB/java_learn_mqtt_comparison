@@ -14,7 +14,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
     
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages 			= 0;
-	private String clientId     			= "JavaSample_revcevier";			//for testWithDifferentClients
+	private String clientId     			= "JavaSample_receivera";			//for testWithDifferentClients
 	
     public TestMain_Hivemqmqttclient_Subscriber() {
     	

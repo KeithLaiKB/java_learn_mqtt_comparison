@@ -15,7 +15,7 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 public class TestMain_Pahomqtt_Subscriber {
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages			= 0;
-	private String clientId     			= "JavaSample_revcevier";
+	private String clientId     			= "JavaSample_receivera";
 	
     private static final Logger LOGGER = LogManager.getLogger(TestMain_Pahomqtt_Subscriber.class);
     
