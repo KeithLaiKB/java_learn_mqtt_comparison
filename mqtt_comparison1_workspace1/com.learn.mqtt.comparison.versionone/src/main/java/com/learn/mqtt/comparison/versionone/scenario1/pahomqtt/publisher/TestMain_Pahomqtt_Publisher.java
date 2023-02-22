@@ -75,7 +75,7 @@ public class TestMain_Pahomqtt_Publisher {
 
         try {
         	//MqttAsyncClient sampleClient = new MqttAsyncClient(brokerUri, clientId, new MqttDefaultFilePersistence());
-        	MqttClient sampleClient = new MqttClient("tcp://localhost:1883", "JavaSample_sender", new MemoryPersistence());
+        	MqttClient sampleClient = new MqttClient("tcp://127.0.0.1:1883", "JavaSample_sender", new MemoryPersistence());
         	
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             

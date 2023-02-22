@@ -39,7 +39,7 @@ public class TestMain_Pahomqtt_Subscriber {
         //final Logger LOGGER = LoggerFactory.getLogger(TestMain_Pahomqtt_Subscriber.class);
 
         try {
-            MqttClient sampleClient = new MqttClient("tcp://localhost:1883", this.clientId, new MemoryPersistence());		// create mqtt client
+            MqttClient sampleClient = new MqttClient("tcp://127.0.0.1:1883", this.clientId, new MemoryPersistence());		// create mqtt client
             //MqttClient sampleClient = new MqttClient(broker, clientId);
 
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
