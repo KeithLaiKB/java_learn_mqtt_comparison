@@ -158,7 +158,7 @@ public class TestMain_Pahomqtt_Publisher {
 		
 		mysocketFactory = context.getSocketFactory();
         try {
-        	MqttAsyncClient sampleClient = new MqttAsyncClient("ssl://127.0.0.1:8883", "JavaSample_sender", new MemoryPersistence());
+        	MqttAsyncClient client1 = new MqttAsyncClient("ssl://192.168.239.137:8883", "JavaSample_sender", new MemoryPersistence());
 
         	MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
@@ -173,7 +173,7 @@ public class TestMain_Pahomqtt_Publisher {
             // -------------------------------------------------------------------------
             
             // connect to broker
-            sampleClient.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
 
             MqttMessage message_tmp=null;
             while(statusUpdate<=statusUpdateMaxTimes-1) {
@@ -182,13 +182,13 @@ public class TestMain_Pahomqtt_Publisher {
             	message_tmp.setQos(0);
             	message_tmp.setRetained(false);
        
-                sampleClient.publish("Resource1", message_tmp);
+            	client1.publish("Resource1", message_tmp);
                 
                 Thread.sleep(500);
             }
             
-            sampleClient.disconnect();
-            sampleClient.close();
+            client1.disconnect();
+            client1.close();
             //System.exit(0);
         } catch(MqttException me) {
             me.printStackTrace();

@@ -118,7 +118,7 @@ public class TestMain_Pahomqtt_Subscriber {
 		mysocketFactory = context.getSocketFactory();
 		
 		try {
-        	MqttAsyncClient sampleClient = new MqttAsyncClient("ssl://127.0.0.1:8883", this.clientId, new MemoryPersistence());
+        	MqttAsyncClient client1 = new MqttAsyncClient("ssl://192.168.239.137:8883", this.clientId, new MemoryPersistence());
 
         	MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
@@ -132,7 +132,7 @@ public class TestMain_Pahomqtt_Subscriber {
             connOpts.setHttpsHostnameVerificationEnabled(false);
             // -------------------------------------------------------------------------
 
-            sampleClient.setCallback(new MqttCallback() {
+            client1.setCallback(new MqttCallback() {
 
 				@Override
 				public void disconnected(MqttDisconnectResponse disconnectResponse) {
@@ -170,15 +170,15 @@ public class TestMain_Pahomqtt_Subscriber {
 			});
             
             // connect to broker
-            sampleClient.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
             
-            sampleClient.subscribe("Resource1",0);						// subscribe
+            client1.subscribe("Resource1",0);						// subscribe
             while(numberOfMessages < expectedNumberOfMessages) {
     			Thread.sleep(200);
             }
             
-            sampleClient.disconnect();
-            sampleClient.close();
+            client1.disconnect();
+            client1.close();
             //System.exit(0);
         } catch(MqttException me) {
             me.printStackTrace();

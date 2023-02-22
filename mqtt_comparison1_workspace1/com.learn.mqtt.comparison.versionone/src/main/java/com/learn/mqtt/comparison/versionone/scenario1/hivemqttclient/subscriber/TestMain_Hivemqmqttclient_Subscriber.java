@@ -34,7 +34,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
 	
 	private void run() {  
 
-        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("127.0.0.1",1883);																	// set broker address
+        final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("192.168.239.137",1883);																	// set broker address
         
         Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();								// authentication
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();

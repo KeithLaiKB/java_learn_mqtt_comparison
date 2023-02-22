@@ -73,7 +73,7 @@ public class TestMain_Pahomqtt_Publisher {
 
         try {
         	//MqttAsyncClient sampleClient = new MqttAsyncClient(brokerUri, clientId, new MqttDefaultFilePersistence());
-        	MqttClient sampleClient = new MqttClient("tcp://127.0.0.1:1883", "JavaSample_sender", new MemoryPersistence());
+        	MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", "JavaSample_sender", new MemoryPersistence());
         	
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
@@ -84,7 +84,7 @@ public class TestMain_Pahomqtt_Publisher {
             connOpts.setPassword("123456".getBytes());								// authentication
 
             // connect to broker
-            sampleClient.connect(connOpts);											//如果是MqttClient 贼需要这个
+            client1.connect(connOpts);											//如果是MqttClient 贼需要这个
             //sampleClient.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
             
             MqttMessage message_tmp=null;
@@ -94,13 +94,13 @@ public class TestMain_Pahomqtt_Publisher {
             	message_tmp.setQos(0);
             	message_tmp.setRetained(false);
        
-                sampleClient.publish("Resource1", message_tmp);
+            	client1.publish("Resource1", message_tmp);
                 
                 Thread.sleep(500);
             }
             
-            sampleClient.disconnect();
-            sampleClient.close();
+            client1.disconnect();
+            client1.close();
             //System.exit(0);
         } catch(MqttException me) {
             me.printStackTrace();
