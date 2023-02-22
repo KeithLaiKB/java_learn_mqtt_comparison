@@ -68,8 +68,6 @@ public class TestMain_Pahomqtt_Publisher {
 
 	public static void main(String[] args) {
 
-        int qos             = 0;
-        
 		int statusUpdateMaxTimes = 50;
 		int statusUpdate = 0;
 
@@ -93,7 +91,7 @@ public class TestMain_Pahomqtt_Publisher {
             while(statusUpdate<=statusUpdateMaxTimes-1) {
             	statusUpdate= statusUpdate+1;
             	message_tmp = new MqttMessage(new String("Hello World!"+statusUpdate).toString().getBytes());
-            	message_tmp.setQos(qos);
+            	message_tmp.setQos(0);
             	message_tmp.setRetained(false);
        
                 sampleClient.publish("Resource1", message_tmp);

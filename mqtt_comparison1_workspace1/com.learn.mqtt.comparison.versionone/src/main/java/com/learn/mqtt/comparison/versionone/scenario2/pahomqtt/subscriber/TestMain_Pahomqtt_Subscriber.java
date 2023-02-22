@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario2.pahomqtt.publisher;
+package com.learn.mqtt.comparison.versionone.scenario2.pahomqtt.subscriber;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -17,85 +17,44 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
+import org.eclipse.paho.mqttv5.client.MqttCallback;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
+import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
-/**
- * 
- * @author laipl
- *
- *	我想要做到
- *	step1(数据):	publisher 	发送 123
- *	step2(数据):	subscriber 	接受123
- *
- *	step3(操作):	关闭 subscriber 
- *
- *	step4(数据):	publisher 	发送45678
- *  
- *	step8(操作):	然后 启动 subscriber
- *	step9(数据):	然后 subscriber 能接受 
- *								1 2 3
- *								      和
- *								4 5 6 7 8
- *
- *  publisher(online)	-------------> 	mosquitto(online)  -------------->	subscriber(online)
- *  publisher(online) 	----123------> 	mosquitto(online)  -------------->	subscriber(online)
- *  publisher(online) 	-------------> 	mosquitto(online)  -------------->	subscriber(online)
- *                     						123
- *  publisher(online) 	-------------> 	mosquitto(online)  ------123----->	subscriber(online)
- *  publisher(online) 	-------------> 	mosquitto(online)  ------123----->	subscriber(online)
- *  																			1 2 3
- *  
- *  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *  +++++++++++++++++++++++++			turn off subscriber		+++++++++++++++++++++++++++++++
- *  ++++++	要设置 subscriber 的 setCleantStart(false) 和 interval, 	使得 subscriber 重启 后   broker     仍然记得 这个subscriber 						+++++++
- *  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *  publisher(online) 	-------------> 	mosquitto(online)  -------------->	subscriber(offline)
- *  publisher(online) 	----45678----> 	mosquitto(online)  -------------->	subscriber(offline)
- *  publisher(online) 	-------------> 	mosquitto(online)  -------------->	subscriber(offline)
- *  									   4 5 6 7 8
- *  
- *  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *  ++++++++++++++++++++++++++ 			turn on subscriber			+++++++++++++++++++++++++++
- *  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *  publisher(online)	-------------> 	mosquitto(online)  --4-5-6-7-8--->	subscriber(online)
- *  									   4 5 6 7 8
- *  publisher(online)	-------------> 	mosquitto(online)  -------------->	subscriber(online)
- *  							     										4 5 6 7 8							
- *
- * 
- * 因为broker需要记得 subscriber 在这里只需要设置 subscriber 
- * 	connOpts.setCleanStart(false);
- * 	connOpts.setSessionExpiryInterval(500L);		//500是个时间 你可以随便设置
- * 
- * 注意 你还需要设置subscriber 的qos不能为0
- * 因为 subscriber的 qos0 是无法reconnect的时候 或者  重新启动这个subscribe(从connect到 subscribe)继续 获得信息
- * 
- * subscriber关闭后	 重启 		就可以直接获得 45678
- *
- *
- * 如果你不关闭 broker, 那么就 不需要 在mosquitto.config 中 设置 persistence true
- */
-/*
- * mqtt 不需要像 coap那样的resource 所以 循环可以直接放在主函数
- * 
- * 
- * 
- * 
- *   MqttClientMqtt 被换成 AsyncClient
- *   因此
- *   sampleClient.connect(connOpts); 也要换成 sampleClient.connect(connOpts, null, null).waitForCompletion(-1);
- * */
-public class TestMain_Pahomqtt_Publisher {
+import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 
+public class TestMain_Pahomqtt_Subscriber {
+	private int expectedNumberOfMessages 	= 30;
+	private int numberOfMessages			= 0;
+	private String clientId     			= "JavaSample_recver";
+	
+    private static final Logger LOGGER = LogManager.getLogger(TestMain_Pahomqtt_Subscriber.class);
+    
+    public TestMain_Pahomqtt_Subscriber() {
+    	
+    }
+    public TestMain_Pahomqtt_Subscriber(String clientId) {
+    	this.clientId = clientId;
+    }
 	public static void main(String[] args) {
-		int statusUpdateMaxTimes = 50;
-		int statusUpdate = 0;
+		if (args.length!=0) {
+			new TestMain_Pahomqtt_Subscriber(args[0]).run();
+		}
+		else {
+			new TestMain_Pahomqtt_Subscriber().run();
+		}
+    }
+	
+	private void run() {
 
     	String serverCaCrt_file					="s_cacert.crt";
-    	String serverCaCrt_file_dir				="/mycerts/pahomqtt/sender/other_own";
+    	String serverCaCrt_file_dir				="/mycerts/pahomqtt/receiver/other_own";
     	String serverCaCrt_file_loc = null;
         
 		String myusr_path = System.getProperty("user.dir");
@@ -142,8 +101,8 @@ public class TestMain_Pahomqtt_Publisher {
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e3) {
 			e3.printStackTrace();
 		} 
-
 		
+
 		// finally, create SSL socket factory
 		SSLContext context=null;
 		SSLSocketFactory mysocketFactory=null;
@@ -157,8 +116,9 @@ public class TestMain_Pahomqtt_Publisher {
 		
 		
 		mysocketFactory = context.getSocketFactory();
-        try {
-        	MqttAsyncClient sampleClient = new MqttAsyncClient("ssl://127.0.0.1:8883", "JavaSample_sender", new MemoryPersistence());
+		
+		try {
+        	MqttAsyncClient sampleClient = new MqttAsyncClient("ssl://127.0.0.1:8883", this.clientId, new MemoryPersistence());
 
         	MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
@@ -171,20 +131,50 @@ public class TestMain_Pahomqtt_Publisher {
             connOpts.setSocketFactory(mysocketFactory);
             connOpts.setHttpsHostnameVerificationEnabled(false);
             // -------------------------------------------------------------------------
+
+            sampleClient.setCallback(new MqttCallback() {
+
+				@Override
+				public void disconnected(MqttDisconnectResponse disconnectResponse) {
+					LOGGER.info("mqtt disconnected:"+disconnectResponse.toString());
+				}
+
+				@Override
+				public void mqttErrorOccurred(MqttException exception) {
+					LOGGER.info("mqtt error occurred");
+					
+				}
+
+				@Override
+				public void deliveryComplete(IMqttToken token) {
+					LOGGER.info("mqtt delivery complete");
+				}
+
+				@Override
+				public void connectComplete(boolean reconnect, String serverURI) {
+
+					LOGGER.info("mqtt connect complete");
+				}
+
+				@Override
+				public void authPacketArrived(int reasonCode, MqttProperties properties) {
+					LOGGER.info("mqtt auth Packet Arrived");
+				}
+
+				@Override
+				public void messageArrived(String topic, MqttMessage message) throws Exception {
+					System.out.println(new String(message.getPayload()));
+					numberOfMessages = numberOfMessages +1;
+					//LOGGER.info("message Arrived:\t"+ new String(message.getPayload()));
+				}
+			});
             
             // connect to broker
             sampleClient.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
-
-            MqttMessage message_tmp=null;
-            while(statusUpdate<=statusUpdateMaxTimes-1) {
-            	statusUpdate= statusUpdate+1;
-            	message_tmp = new MqttMessage(new String("Hello World!"+statusUpdate).toString().getBytes());
-            	message_tmp.setQos(0);
-            	message_tmp.setRetained(false);
-       
-                sampleClient.publish("Resource1", message_tmp);
-                
-                Thread.sleep(500);
+            
+            sampleClient.subscribe("Resource1",0);						// subscribe
+            while(numberOfMessages < expectedNumberOfMessages) {
+    			Thread.sleep(200);
             }
             
             sampleClient.disconnect();
@@ -195,6 +185,7 @@ public class TestMain_Pahomqtt_Publisher {
         } catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+	
 	}
-
 }
