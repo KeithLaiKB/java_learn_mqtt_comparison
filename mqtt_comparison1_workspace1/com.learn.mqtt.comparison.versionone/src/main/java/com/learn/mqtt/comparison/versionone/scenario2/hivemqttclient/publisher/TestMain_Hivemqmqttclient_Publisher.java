@@ -14,11 +14,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
+import com.hivemq.client.internal.mqtt.handler.ssl.MqttSslInitializer;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.MqttClientBuilder;
 import com.hivemq.client.mqtt.MqttClientSslConfig;
@@ -101,7 +103,7 @@ public class TestMain_Hivemqmqttclient_Publisher {
 			e3.printStackTrace();
 		} 
 		
-		
+		//MqttSslInitializer a;
 
         
         final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("192.168.239.137",8883);																		// set broker address	
@@ -125,7 +127,9 @@ public class TestMain_Hivemqmqttclient_Publisher {
         // -------------------------------------------------------------------------
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);		// publisher connect
+        //CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// publisher connect
+        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage).orTimeout(5000, TimeUnit.MILLISECONDS);		// publisher connect
+        
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");		// topic setting
     	c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos setting

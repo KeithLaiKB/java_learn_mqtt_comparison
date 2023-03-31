@@ -3,6 +3,7 @@ package com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.subscriber;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
+import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
 import org.eclipse.paho.mqttv5.client.MqttCallback;
 import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
@@ -39,8 +40,10 @@ public class TestMain_Pahomqtt_Subscriber {
         //final Logger LOGGER = LoggerFactory.getLogger(TestMain_Pahomqtt_Subscriber.class);
 
         try {
-            MqttClient sampleClient = new MqttClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());		// create mqtt client
-            //MqttClient sampleClient = new MqttClient(broker, clientId);
+        	//MqttAsyncClient sampleClient = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	//MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	MqttAsyncClient client1 = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	//MqttClient client1 = new MqttClient("tcp://138.229.113.84:1883", this.clientId, new MemoryPersistence());
 
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
@@ -50,7 +53,7 @@ public class TestMain_Pahomqtt_Subscriber {
             
             connOpts.setCleanStart(true);
 
-            sampleClient.setCallback(new MqttCallback() {
+            client1.setCallback(new MqttCallback() {
 
 				@Override
 				public void disconnected(MqttDisconnectResponse disconnectResponse) {
@@ -87,15 +90,16 @@ public class TestMain_Pahomqtt_Subscriber {
 				}
 			});
             
-            sampleClient.connect(connOpts);								// connect
+            //client1.connect(connOpts);																// connect
+            client1.connect(connOpts, null, null).waitForCompletion(5000);								// connect
             
-            sampleClient.subscribe("Resource1",0);						// subscribe
+            client1.subscribe("Resource1",1);						// subscribe
             while(numberOfMessages < expectedNumberOfMessages) {
     			Thread.sleep(200);
             }
 
-            sampleClient.disconnect();
-            sampleClient.close();
+            client1.disconnect();
+            client1.close();
             //System.exit(0);
         } catch(MqttException me) {
             me.printStackTrace();

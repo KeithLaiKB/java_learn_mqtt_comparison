@@ -170,7 +170,8 @@ public class TestMain_Pahomqtt_Subscriber {
 			});
             
             // connect to broker
-            client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            //client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            client1.connect(connOpts, null, null).waitForCompletion(5000); 	//如果是MqttAsyncClient 贼需要这个
             
             client1.subscribe("Resource1",0);						// subscribe
             while(numberOfMessages < expectedNumberOfMessages) {

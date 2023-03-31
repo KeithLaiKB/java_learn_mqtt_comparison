@@ -58,7 +58,7 @@ class test1a_sec {
 	
 	@Test
 	void testPahomqtt_1Server1Client() {
-		int clientNum=3;
+		int clientNum=21;
 		testPahomqtt_specifyClientNum(clientNum);
 	}
 	
@@ -97,7 +97,7 @@ class test1a_sec {
 					TestMain_Pahomqtt_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
-					System.out.println("pahomqtt subscriber starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
+					System.out.println("pahomqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
 					LOGGER.info("pahomqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));	
 				}
 			};		
@@ -155,7 +155,7 @@ class test1a_sec {
 					TestMain_Hivemqmqttclient_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
-					System.out.println("hivemqtt subscriber starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
+					System.out.println("hivemqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
 					LOGGER.info("hivemqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));	
 				}
 			};		

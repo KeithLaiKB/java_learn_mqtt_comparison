@@ -38,7 +38,7 @@ class test1a {
 	@AfterAll
 	static void toEnd() {
 		System.out.println("pahomqtt total starttime:"+timeRs_testPahomqtt.get("startTime")+"/endtime:"+timeRs_testPahomqtt.get("endTime")+"/usedtime:"+timeRs_testPahomqtt.get("usedTime")+"/usedtime_sec:"+timeRs_testPahomqtt.get("usedTime_sec"));
-		System.out.println("hivemqtt total starttime:"+timeRs_testHivemqttclient.get("startTime")+"/endtime:"+timeRs_testHivemqttclient.get("endTime")+"/usedtime:"+timeRs_testHivemqttclient.get("usedTime")+"/usedtime_sec:"+timeRs_testHivemqttclient.get("usedTime_sec"));
+		//System.out.println("hivemqtt total starttime:"+timeRs_testHivemqttclient.get("startTime")+"/endtime:"+timeRs_testHivemqttclient.get("endTime")+"/usedtime:"+timeRs_testHivemqttclient.get("usedTime")+"/usedtime_sec:"+timeRs_testHivemqttclient.get("usedTime_sec"));
 	}
 	
 	@BeforeEach
@@ -62,7 +62,7 @@ class test1a {
 		testPahomqtt_specifyClientNum(clientNum);
 	}
 	
-	@Test
+	//@Test
 	void testHivemqtt_1Server1Client() {
 		int clientNum=3;
 		testHivemqtt_specifyClientNum(clientNum);
@@ -97,7 +97,7 @@ class test1a {
 					TestMain_Pahomqtt_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
-					System.out.println("pahomqtt subscriber starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
+					System.out.println("pahomqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
 					LOGGER.info("pahomqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));	
 				}
 			};		
@@ -155,7 +155,7 @@ class test1a {
 					TestMain_Hivemqmqttclient_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
-					System.out.println("hivemqtt subscriber starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
+					System.out.println("hivemqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));
 					LOGGER.info("hivemqtt subscriber"+seqTmp+" starttime:"+timeRs1.get("startTime")+"/endtime:"+timeRs1.get("endTime")+"/usedtime:"+timeRs1.get("usedTime")+"/usedtime_sec:"+timeRs1.get("usedTime_sec"));	
 				}
 			};		
