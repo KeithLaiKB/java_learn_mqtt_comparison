@@ -42,8 +42,10 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId).buildAsync();		// create publisher
         
-        //CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
-        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage).orTimeout(5000, TimeUnit.MILLISECONDS);		// subscriber connect
+        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
+        while(cplfu_connect_rslt.isDone()==false) {
+        	
+        }
        
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting

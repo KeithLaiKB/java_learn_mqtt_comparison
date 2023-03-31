@@ -173,8 +173,8 @@ public class TestMain_Pahomqtt_Publisher {
             // -------------------------------------------------------------------------
             
             // connect to broker
-            //client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
-            client1.connect(connOpts, null, null).waitForCompletion(5000); 	//如果是MqttAsyncClient 贼需要这个
+            client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            //client1.connect(connOpts, null, null).waitForCompletion(5000); 	//如果是MqttAsyncClient 贼需要这个
 
             MqttMessage message_tmp=null;
             while(statusUpdate<=statusUpdateMaxTimes-1) {

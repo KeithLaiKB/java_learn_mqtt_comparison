@@ -41,8 +41,8 @@ public class TestMain_Pahomqtt_Subscriber {
 
         try {
         	//MqttAsyncClient sampleClient = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
-        	//MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
-        	MqttAsyncClient client1 = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	//MqttAsyncClient client1 = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
         	//MqttClient client1 = new MqttClient("tcp://138.229.113.84:1883", this.clientId, new MemoryPersistence());
 
             MqttConnectionOptions connOpts = new MqttConnectionOptions();
@@ -90,8 +90,8 @@ public class TestMain_Pahomqtt_Subscriber {
 				}
 			});
             
-            //client1.connect(connOpts);																// connect
-            client1.connect(connOpts, null, null).waitForCompletion(5000);								// connect
+            client1.connect(connOpts);																// connect
+            //client1.connect(connOpts, null, null).waitForCompletion(-1);								// connect
             
             client1.subscribe("Resource1",1);						// subscribe
             while(numberOfMessages < expectedNumberOfMessages) {
