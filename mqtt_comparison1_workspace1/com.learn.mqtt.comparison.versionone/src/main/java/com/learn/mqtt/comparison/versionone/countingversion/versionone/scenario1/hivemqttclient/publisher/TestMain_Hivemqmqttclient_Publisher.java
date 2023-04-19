@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario1.hivemqttclient.publisher;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario1.hivemqttclient.publisher;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;

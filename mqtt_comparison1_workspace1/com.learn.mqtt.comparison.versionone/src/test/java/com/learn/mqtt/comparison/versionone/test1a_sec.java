@@ -93,7 +93,7 @@ class test1a_sec {
 					//paho 不能用同一个clientId 去连接一个topic
 					//TestMain_Pahomqtt_Subscriber.main(null);
 					//所以每一个clientId需要独立的给予一个clientId
-					String[] inputArrTmp = {"JavaSample_revcevier"+seqTmp};
+					String[] inputArrTmp = {"JavaSample_recver"+seqTmp};
 					TestMain_Pahomqtt_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);

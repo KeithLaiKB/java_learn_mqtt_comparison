@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario2.hivemqttclient.publisher;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario2.hivemqttclient.subscriber;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -20,7 +20,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
-
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.MqttClientBuilder;
 import com.hivemq.client.mqtt.MqttClientSslConfig;
@@ -30,41 +29,30 @@ import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedListener;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 
 import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder;
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect;
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
-import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
 
-/**
- * 
- * 
- * <p>
- * 							description:																				</br>	
- * &emsp;						qos 0																					</br>	
- * &emsp;						if it couldn't connect, still wait though there are something wrong during connection	</br>																							</br>
- *
- *
- * @author laipl
- *
- */
-public class TestMain_Hivemqmqttclient_Publisher {
-
+public class TestMain_Hivemqmqttclient_Subscriber {
+    
+	private int expectedNumberOfMessages 	= 30;
+	private int numberOfMessages 			= 0;
+	
 	private boolean connected = false;
 	
-    public TestMain_Hivemqmqttclient_Publisher() {
+    public TestMain_Hivemqmqttclient_Subscriber() {
     	
     }
+
 	public static void main(String[] args) {
-		new TestMain_Hivemqmqttclient_Publisher().run();
-
+		new TestMain_Hivemqmqttclient_Subscriber().run();
     }
-	private void run() {
 
-        int statusUpdate		=0;
-        int statusUpdateMaxTimes=50;
+	
+	private void run() {  
 
-
-    	String serverCaCrt_file					="s_cacert.crt";
+		String serverCaCrt_file					="s_cacert.crt";
     	String serverCaCrt_file_dir				="/mycerts/hivemqttclient/sender/other_own";
     	String serverCaCrt_file_loc = null;
 
@@ -114,15 +102,13 @@ public class TestMain_Hivemqmqttclient_Publisher {
 			e3.printStackTrace();
 		} 
 		
-		//MqttSslInitializer a;
-
-        
+		
         final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("192.168.239.137",8883);																		// set broker address	
         // 所以初步认为 MqttAsyncClient 是包含了 MqttRxClient 
         Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();									// authentication
         
         //-------------set TLS/SSL-------
-        MqttClientBuilder mqttClientBuilder = MqttClient.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_sender");
+        MqttClientBuilder mqttClientBuilder = MqttClient.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_recver");
         mqttClientBuilder.sslConfig(MqttClientSslConfig.builder()
                       .keyManagerFactory(null)
                       .trustManagerFactory(tmf)		//.hostnameVerifier(hostnameVerifier)
@@ -135,10 +121,10 @@ public class TestMain_Hivemqmqttclient_Publisher {
 
         Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
-        // -------------------------------------------------------------------------
+        // -------------------------------------------------------------------------																// set broker address
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// publisher connect
+        CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
         while(connected==false) {
         	try {
 				Thread.sleep(1);
@@ -147,27 +133,30 @@ public class TestMain_Hivemqmqttclient_Publisher {
 				e.printStackTrace();
 			}
         }
+       
+        Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
+        Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
+        c1.qos(MqttQos.AT_MOST_ONCE);																				// qos setting
+        c1.callback(publish -> {
+        			numberOfMessages = numberOfMessages +1;
+        			System.out.println(new String(publish.getPayloadAsBytes())); 
+        		}); 	// set callback
+        c1.send();		//subscribe callback and something 
         
-    	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
-    	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");		// topic setting
-    	c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos setting
-
-        while(statusUpdate<=statusUpdateMaxTimes-1) {
-        	statusUpdate = statusUpdate+1;
-        	String str_content_tmp = "Hello World!" + statusUpdate;
-
-        	c1.payload(str_content_tmp.getBytes());		// set payload
-        	c1.send();									// publish
-        	//System.out.println("kk");
+        
+        while(numberOfMessages < expectedNumberOfMessages) {
         	try {
-        		Thread.sleep(500);
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         }
 
         client1.disconnect();
-    }
+        //System.exit(0);				//if using clean false, disconnect couldn't finished the program
+		
+		
+	}
 	// 我们可以通过关闭掉 docker,来调试
 	private class MyConnectedListener implements MqttClientConnectedListener {
 

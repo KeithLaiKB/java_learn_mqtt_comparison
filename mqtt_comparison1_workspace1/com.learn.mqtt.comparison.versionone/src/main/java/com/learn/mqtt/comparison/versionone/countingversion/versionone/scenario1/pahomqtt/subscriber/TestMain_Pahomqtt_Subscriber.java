@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.subscriber;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario1.pahomqtt.subscriber;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,23 +16,15 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 public class TestMain_Pahomqtt_Subscriber {
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages			= 0;
-	private String clientId     			= "JavaSample_recver";
-	
+
     private static final Logger LOGGER = LogManager.getLogger(TestMain_Pahomqtt_Subscriber.class);
     
     public TestMain_Pahomqtt_Subscriber() {
     	
     }
-    public TestMain_Pahomqtt_Subscriber(String clientId) {
-    	this.clientId = clientId;
-    }
+
 	public static void main(String[] args) {
-		if (args.length!=0) {
-			new TestMain_Pahomqtt_Subscriber(args[0]).run();
-		}
-		else {
-			new TestMain_Pahomqtt_Subscriber().run();
-		}
+		new TestMain_Pahomqtt_Subscriber().run();
     }
 	
 	private void run() {
@@ -41,7 +33,7 @@ public class TestMain_Pahomqtt_Subscriber {
 
         try {
         	//MqttAsyncClient sampleClient = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
-        	MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
+        	MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", "JavaSample_recver", new MemoryPersistence());
         	//MqttAsyncClient client1 = new MqttAsyncClient("tcp://192.168.239.137:1883", this.clientId, new MemoryPersistence());
         	//MqttClient client1 = new MqttClient("tcp://138.229.113.84:1883", this.clientId, new MemoryPersistence());
 
@@ -53,42 +45,7 @@ public class TestMain_Pahomqtt_Subscriber {
             
             connOpts.setCleanStart(true);
 
-            client1.setCallback(new MqttCallback() {
-
-				@Override
-				public void disconnected(MqttDisconnectResponse disconnectResponse) {
-					LOGGER.info("mqtt disconnected:"+disconnectResponse.toString());
-				}
-
-				@Override
-				public void mqttErrorOccurred(MqttException exception) {
-					LOGGER.info("mqtt error occurred");
-					
-				}
-
-				@Override
-				public void deliveryComplete(IMqttToken token) {
-					LOGGER.info("mqtt delivery complete");
-				}
-
-				@Override
-				public void connectComplete(boolean reconnect, String serverURI) {
-
-					LOGGER.info("mqtt connect complete");
-				}
-
-				@Override
-				public void authPacketArrived(int reasonCode, MqttProperties properties) {
-					LOGGER.info("mqtt auth Packet Arrived");
-				}
-
-				@Override
-				public void messageArrived(String topic, MqttMessage message) throws Exception {
-					System.out.println(new String(message.getPayload()));
-					numberOfMessages = numberOfMessages +1;
-					//LOGGER.info("message Arrived:\t"+ new String(message.getPayload()));
-				}
-			});
+            client1.setCallback(new MyMqttCallback());
             
             client1.connect(connOpts);																// connect
             //client1.connect(connOpts, null, null).waitForCompletion(-1);								// connect
@@ -105,6 +62,43 @@ public class TestMain_Pahomqtt_Subscriber {
             me.printStackTrace();
         } catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private class MyMqttCallback implements MqttCallback{
+
+		@Override
+		public void disconnected(MqttDisconnectResponse disconnectResponse) {
+			LOGGER.info("mqtt disconnected:"+disconnectResponse.toString());
+		}
+
+		@Override
+		public void mqttErrorOccurred(MqttException exception) {
+			LOGGER.info("mqtt error occurred");
+			
+		}
+
+		@Override
+		public void deliveryComplete(IMqttToken token) {
+			LOGGER.info("mqtt delivery complete");
+		}
+
+		@Override
+		public void connectComplete(boolean reconnect, String serverURI) {
+
+			LOGGER.info("mqtt connect complete");
+		}
+
+		@Override
+		public void authPacketArrived(int reasonCode, MqttProperties properties) {
+			LOGGER.info("mqtt auth Packet Arrived");
+		}
+
+		@Override
+		public void messageArrived(String topic, MqttMessage message) throws Exception {
+			System.out.println(new String(message.getPayload()));
+			numberOfMessages = numberOfMessages +1;
+			//LOGGER.info("message Arrived:\t"+ new String(message.getPayload()));
 		}
 	}
 }

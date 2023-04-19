@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario1.hivemqttclient.subscriber;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario1.hivemqttclient.subscriber;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -17,23 +17,15 @@ public class TestMain_Hivemqmqttclient_Subscriber {
     
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages 			= 0;
-	private String clientId     			= "JavaSample_recver";			//for testWithDifferentClients
 	
 	private boolean connected = false;
 	
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
     }
-    public TestMain_Hivemqmqttclient_Subscriber(String clientId) {
-    	this.clientId = clientId;
-    }
+
 	public static void main(String[] args) {
-		if (args.length!=0) {
-			new TestMain_Hivemqmqttclient_Subscriber(args[0]).run();
-		}
-		else {
-			new TestMain_Hivemqmqttclient_Subscriber().run();
-		}
+		new TestMain_Hivemqmqttclient_Subscriber().run();
     }
 
 	
@@ -43,7 +35,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         
         Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();								// authentication
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId).addConnectedListener(new MyConnectedListener()).buildAsync();		// create publisher
+        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_recver").addConnectedListener(new MyConnectedListener()).buildAsync();		// create publisher
         
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
         while(connected==false) {

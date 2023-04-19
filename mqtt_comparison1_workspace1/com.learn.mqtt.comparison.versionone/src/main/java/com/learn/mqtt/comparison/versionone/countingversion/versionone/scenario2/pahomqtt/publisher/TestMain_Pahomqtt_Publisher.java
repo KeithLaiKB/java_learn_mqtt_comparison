@@ -1,6 +1,23 @@
-package com.learn.mqtt.comparison.versionone.scenario1.pahomqtt.publisher;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario2.pahomqtt.publisher;
 
-import org.eclipse.paho.mqttv5.client.MqttClient;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
@@ -63,37 +80,107 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
  */
 /*
  * mqtt 不需要像 coap那样的resource 所以 循环可以直接放在主函数
+ * 
+ * 
+ * 
+ * 
+ *   MqttClientMqtt 被换成 AsyncClient
+ *   因此
+ *   sampleClient.connect(connOpts); 也要换成 sampleClient.connect(connOpts, null, null).waitForCompletion(-1);
  * */
 public class TestMain_Pahomqtt_Publisher {
 
 	public static void main(String[] args) {
-
 		int statusUpdateMaxTimes = 50;
 		int statusUpdate = 0;
 
+    	String serverCaCrt_file					="s_cacert.crt";
+    	String serverCaCrt_file_dir				="/mycerts/pahomqtt/sender/other_own";
+    	String serverCaCrt_file_loc = null;
+        
+		String myusr_path = System.getProperty("user.dir");
+		serverCaCrt_file_loc 							= 	myusr_path	+ serverCaCrt_file_dir		+"/" + 	serverCaCrt_file;
+        
+		
+		//s_cacert.crt ->FileInputStream->BufferedInputStream-> ca Certificate
+        FileInputStream fis= null;
+        CertificateFactory cf = null;
+        Certificate ca=null;
+        InputStream caInput =null;
+		try {
+			cf = CertificateFactory.getInstance("X.509");
+			fis = new FileInputStream(serverCaCrt_file_loc);
+			caInput = new BufferedInputStream(fis);
+
+			ca = cf.generateCertificate(caInput);
+		} catch (FileNotFoundException | CertificateException e1) {
+			e1.printStackTrace();
+		} 
+		finally {
+			try {
+				caInput.close();	//关闭 s_cacert.crt 的stream  
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Create a KeyStore containing our trusted CAs
+		// KeyStore set ca Certificate -> TrustManagerFactory
+		String keyStoreType = KeyStore.getDefaultType();
+		KeyStore keyStore=null;
+		TrustManagerFactory tmf = null;
+		try {
+			// Create a KeyStore containing our trusted CAs
+			keyStoreType = KeyStore.getDefaultType();
+			keyStore = KeyStore.getInstance(keyStoreType);
+			keyStore.load(null, null);
+			keyStore.setCertificateEntry("ca", ca);
+
+			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+			tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+			tmf.init(keyStore);
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e3) {
+			e3.printStackTrace();
+		} 
+
+		
+		// finally, create SSL socket factory
+		SSLContext context=null;
+		SSLSocketFactory mysocketFactory=null;
+		try {
+			//context = SSLContext.getInstance("SSL");
+			context = SSLContext.getInstance("TLSv1.3");
+			context.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
+		} catch (NoSuchAlgorithmException | KeyManagementException e2) {
+			e2.printStackTrace();
+		} 
+		
+		
+		mysocketFactory = context.getSocketFactory();
         try {
-        	//MqttAsyncClient sampleClient = new MqttAsyncClient("tcp://192.168.239.137:1883", "JavaSample_sender", new MemoryPersistence());
-        	MqttClient client1 = new MqttClient("tcp://192.168.239.137:1883", "JavaSample_sender", new MemoryPersistence());
-        	//MqttAsyncClient client1 = new MqttAsyncClient("tcp://192.168.239.137:1883", "JavaSample_sender", new MemoryPersistence());
-        	//MqttClient client1 = new MqttClient("tcp://138.229.113.84:1883", "JavaSample_sender", new MemoryPersistence());
-        	
-            MqttConnectionOptions connOpts = new MqttConnectionOptions();
+        	MqttAsyncClient client1 = new MqttAsyncClient("ssl://192.168.239.137:8883", "JavaSample_sender", new MemoryPersistence());
+
+        	MqttConnectionOptions connOpts = new MqttConnectionOptions();
             
             connOpts.setCleanStart(true);
-
             
             connOpts.setUserName("IamPublisherOne");								// authentication
             connOpts.setPassword("123456".getBytes());								// authentication
 
-            // connect to broker
-            client1.connect(connOpts);												//如果是MqttClient 贼需要这个
-            //client1.connect(connOpts, null, null).waitForCompletion(-1); 			//如果是MqttAsyncClient 贼需要这个
+            //-------------set TLS/SSL-------
+            connOpts.setSocketFactory(mysocketFactory);
+            connOpts.setHttpsHostnameVerificationEnabled(false);
+            // -------------------------------------------------------------------------
             
+            // connect to broker
+            client1.connect(connOpts, null, null).waitForCompletion(-1); 	//如果是MqttAsyncClient 贼需要这个
+            //client1.connect(connOpts, null, null).waitForCompletion(5000); 	//如果是MqttAsyncClient 贼需要这个
+
             MqttMessage message_tmp=null;
             while(statusUpdate<=statusUpdateMaxTimes-1) {
             	statusUpdate= statusUpdate+1;
             	message_tmp = new MqttMessage(new String("Hello World!"+statusUpdate).toString().getBytes());
-            	message_tmp.setQos(1);
+            	message_tmp.setQos(0);
             	message_tmp.setRetained(false);
        
             	client1.publish("Resource1", message_tmp);
@@ -109,6 +196,6 @@ public class TestMain_Pahomqtt_Publisher {
         } catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 }

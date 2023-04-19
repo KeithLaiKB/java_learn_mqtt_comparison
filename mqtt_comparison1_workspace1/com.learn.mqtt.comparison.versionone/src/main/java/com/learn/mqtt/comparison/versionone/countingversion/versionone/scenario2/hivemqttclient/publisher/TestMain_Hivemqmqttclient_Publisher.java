@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.scenario2.hivemqttclient.publisher;
+package com.learn.mqtt.comparison.versionone.countingversion.versionone.scenario2.hivemqttclient.publisher;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -48,9 +48,11 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
  *
  */
 public class TestMain_Hivemqmqttclient_Publisher {
-
-	private boolean connected = false;
 	
+
+    
+	private boolean connected = false;
+
     public TestMain_Hivemqmqttclient_Publisher() {
     	
     }
@@ -60,8 +62,8 @@ public class TestMain_Hivemqmqttclient_Publisher {
     }
 	private void run() {
 
-        int statusUpdate		=0;
-        int statusUpdateMaxTimes=50;
+	    int statusUpdate		=0;
+	    int statusUpdateMaxTimes=50;
 
 
     	String serverCaCrt_file					="s_cacert.crt";

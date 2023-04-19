@@ -38,7 +38,7 @@ class test1a {
 	@AfterAll
 	static void toEnd() {
 		System.out.println("pahomqtt total starttime:"+timeRs_testPahomqtt.get("startTime")+"/endtime:"+timeRs_testPahomqtt.get("endTime")+"/usedtime:"+timeRs_testPahomqtt.get("usedTime")+"/usedtime_sec:"+timeRs_testPahomqtt.get("usedTime_sec"));
-		//System.out.println("hivemqtt total starttime:"+timeRs_testHivemqttclient.get("startTime")+"/endtime:"+timeRs_testHivemqttclient.get("endTime")+"/usedtime:"+timeRs_testHivemqttclient.get("usedTime")+"/usedtime_sec:"+timeRs_testHivemqttclient.get("usedTime_sec"));
+		System.out.println("hivemqtt total starttime:"+timeRs_testHivemqttclient.get("startTime")+"/endtime:"+timeRs_testHivemqttclient.get("endTime")+"/usedtime:"+timeRs_testHivemqttclient.get("usedTime")+"/usedtime_sec:"+timeRs_testHivemqttclient.get("usedTime_sec"));
 	}
 	
 	@BeforeEach
@@ -62,7 +62,7 @@ class test1a {
 		testPahomqtt_specifyClientNum(clientNum);
 	}
 	
-	//@Test
+	@Test
 	void testHivemqtt_1Server1Client() {
 		int clientNum=3;
 		testHivemqtt_specifyClientNum(clientNum);
@@ -93,7 +93,7 @@ class test1a {
 					//paho 不能用同一个clientId 去连接一个topic
 					//TestMain_Pahomqtt_Subscriber.main(null);
 					//所以每一个clientId需要独立的给予一个clientId
-					String[] inputArrTmp = {"JavaSample_revcevier"+seqTmp};
+					String[] inputArrTmp = {"JavaSample_recver"+seqTmp};
 					TestMain_Pahomqtt_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
@@ -151,7 +151,7 @@ class test1a {
 					//paho 不能用同一个clientId 去连接一个topic
 					//TestMain_Hivemqmqttclient_Subscriber.main(null);
 					//所以每一个clientId需要独立的给予一个clientId
-					String[] inputArrTmp = {"JavaSample_revcevier"+seqTmp};	
+					String[] inputArrTmp = {"JavaSample_recver"+seqTmp};	
 					TestMain_Hivemqmqttclient_Subscriber.main(inputArrTmp);
 					
 					Map timeRs1 = MyTimeUtil.countUsedTime(clientStartTime);
