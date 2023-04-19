@@ -24,6 +24,8 @@ import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.MqttClientBuilder;
 import com.hivemq.client.mqtt.MqttClientSslConfig;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedContext;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedListener;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient;
@@ -37,6 +39,8 @@ public class TestMain_Hivemqmqttclient_Subscriber {
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages 			= 0;
 	private String clientId     			= "JavaSample_recver";			//for testWithDifferentClients
+	
+	private boolean connected = false;
 	
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
@@ -123,14 +127,19 @@ public class TestMain_Hivemqmqttclient_Subscriber {
                           }})
                       .build());
 
-        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).buildRx();
+        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
         // -------------------------------------------------------------------------																// set broker address
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
-        while(cplfu_connect_rslt.isDone()==false) {
-        	
+        while(connected==false) {
+        	try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
        
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
@@ -154,6 +163,17 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         client1.disconnect();
         //System.exit(0);				//if using clean false, disconnect couldn't finished the program
 		
+		
+	}
+	// 我们可以通过关闭掉 docker,来调试
+	private class MyConnectedListener implements MqttClientConnectedListener {
+
+		@Override
+		public void onConnected(MqttClientConnectedContext context) {
+			// TODO Auto-generated method stub
+			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
+			connected=true;
+		}
 		
 	}
 }

@@ -25,6 +25,8 @@ import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.MqttClientBuilder;
 import com.hivemq.client.mqtt.MqttClientSslConfig;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedContext;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedListener;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient;
@@ -32,6 +34,7 @@ import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
 import com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5Connect;
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
+
 /**
  * 
  * 
@@ -46,8 +49,16 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
  */
 public class TestMain_Hivemqmqttclient_Publisher {
 
-
+	private boolean connected = false;
+	
+    public TestMain_Hivemqmqttclient_Publisher() {
+    	
+    }
 	public static void main(String[] args) {
+		new TestMain_Hivemqmqttclient_Publisher().run();
+
+    }
+	private void run() {
 
         int statusUpdate		=0;
         int statusUpdateMaxTimes=50;
@@ -122,14 +133,19 @@ public class TestMain_Hivemqmqttclient_Publisher {
                           }})
                       .build());
 
-        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).buildRx();
+        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
         // -------------------------------------------------------------------------
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// publisher connect
-        while(cplfu_connect_rslt.isDone()==false) {
-        	
+        while(connected==false) {
+        	try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
@@ -142,7 +158,7 @@ public class TestMain_Hivemqmqttclient_Publisher {
 
         	c1.payload(str_content_tmp.getBytes());		// set payload
         	c1.send();									// publish
-
+        	//System.out.println("kk");
         	try {
         		Thread.sleep(500);
     		} catch (InterruptedException e) {
@@ -152,5 +168,15 @@ public class TestMain_Hivemqmqttclient_Publisher {
 
         client1.disconnect();
     }
+	// 我们可以通过关闭掉 docker,来调试
+	private class MyConnectedListener implements MqttClientConnectedListener {
 
+		@Override
+		public void onConnected(MqttClientConnectedContext context) {
+			// TODO Auto-generated method stub
+			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
+			connected=true;
+		}
+		
+	}
 }
