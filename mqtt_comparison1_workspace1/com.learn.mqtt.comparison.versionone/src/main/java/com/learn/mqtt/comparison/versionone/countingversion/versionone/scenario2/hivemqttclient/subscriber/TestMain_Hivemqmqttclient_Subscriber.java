@@ -38,9 +38,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
     
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages 			= 0;
-	
-	private boolean connected = false;
-	
+
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
     }
@@ -119,20 +117,17 @@ public class TestMain_Hivemqmqttclient_Subscriber {
                           }})
                       .build());
 
-        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
+        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
         // -------------------------------------------------------------------------																// set broker address
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
-        while(connected==false) {
-        	try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        
+        while(client1.getState().isConnected()==false) {
+        	//do nothing, just wait for connected
         }
+        //System.out.println("connected");
        
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
@@ -157,15 +152,5 @@ public class TestMain_Hivemqmqttclient_Subscriber {
 		
 		
 	}
-	// 我们可以通过关闭掉 docker,来调试
-	private class MyConnectedListener implements MqttClientConnectedListener {
 
-		@Override
-		public void onConnected(MqttClientConnectedContext context) {
-			// TODO Auto-generated method stub
-			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
-			connected=true;
-		}
-		
-	}
 }

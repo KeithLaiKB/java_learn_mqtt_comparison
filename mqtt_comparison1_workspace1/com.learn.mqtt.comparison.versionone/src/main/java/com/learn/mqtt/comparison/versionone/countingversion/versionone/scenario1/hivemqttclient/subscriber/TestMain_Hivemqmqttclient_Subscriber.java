@@ -17,8 +17,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
     
 	private int expectedNumberOfMessages 	= 30;
 	private int numberOfMessages 			= 0;
-	
-	private boolean connected = false;
+
 	
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
@@ -35,17 +34,14 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         
         Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();								// authentication
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
-        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_recver").addConnectedListener(new MyConnectedListener()).buildAsync();		// create publisher
+        Mqtt5AsyncClient client1 = Mqtt5Client.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_recver").buildAsync();		// create publisher
         
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
-        while(connected==false) {
-        	try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        
+        while(client1.getState().isConnected()==false) {
+        	//do nothing, just wait for connected
         }
+        //System.out.println("connected");
         
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
@@ -69,14 +65,5 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         //System.exit(0);				//if using clean false, disconnect couldn't finished the program
 
 	}
-	// 我们可以通过关闭掉 docker,来调试
-	private class MyConnectedListener implements MqttClientConnectedListener {
 
-		@Override
-		public void onConnected(MqttClientConnectedContext context) {
-			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
-			connected=true;
-		}
-		
-	}
 }

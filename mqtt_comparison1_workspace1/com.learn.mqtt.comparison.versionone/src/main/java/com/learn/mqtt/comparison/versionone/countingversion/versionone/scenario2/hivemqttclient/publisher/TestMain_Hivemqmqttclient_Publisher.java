@@ -48,19 +48,9 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
  *
  */
 public class TestMain_Hivemqmqttclient_Publisher {
-	
 
-    
-	private boolean connected = false;
 
-    public TestMain_Hivemqmqttclient_Publisher() {
-    	
-    }
 	public static void main(String[] args) {
-		new TestMain_Hivemqmqttclient_Publisher().run();
-
-    }
-	private void run() {
 
 	    int statusUpdate		=0;
 	    int statusUpdateMaxTimes=50;
@@ -135,20 +125,17 @@ public class TestMain_Hivemqmqttclient_Publisher {
                           }})
                       .build());
 
-        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
+        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
         // -------------------------------------------------------------------------
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// publisher connect
-        while(connected==false) {
-        	try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        
+        while(client1.getState().isConnected()==false) {
+        	//do nothing, just wait for connected
         }
+		System.out.println("connected");
         
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");		// topic setting
@@ -169,16 +156,7 @@ public class TestMain_Hivemqmqttclient_Publisher {
         }
 
         client1.disconnect();
-    }
-	// 我们可以通过关闭掉 docker,来调试
-	private class MyConnectedListener implements MqttClientConnectedListener {
 
-		@Override
-		public void onConnected(MqttClientConnectedContext context) {
-			// TODO Auto-generated method stub
-			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
-			connected=true;
-		}
-		
-	}
+    }
+
 }
