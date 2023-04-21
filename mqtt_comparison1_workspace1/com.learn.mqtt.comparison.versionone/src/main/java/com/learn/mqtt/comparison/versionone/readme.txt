@@ -1,0 +1,3 @@
+countingversion 里的是修改过 比较好的版本
+testingpacketversion 是根据countingversion 修改的 为了 在测试throughput 在raspberrypi上可以直接使用
+	例如已经提前修改好了 ip地址
