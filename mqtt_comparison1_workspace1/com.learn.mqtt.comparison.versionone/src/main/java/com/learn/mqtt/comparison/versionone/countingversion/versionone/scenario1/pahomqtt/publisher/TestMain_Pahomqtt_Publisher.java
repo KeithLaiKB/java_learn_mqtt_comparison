@@ -92,7 +92,8 @@ public class TestMain_Pahomqtt_Publisher {
             MqttMessage message_tmp=null;
             while(statusUpdate<=statusUpdateMaxTimes-1) {
             	statusUpdate= statusUpdate+1;
-            	message_tmp = new MqttMessage(new String("Hello World!"+statusUpdate).toString().getBytes());
+            	
+            	message_tmp = new MqttMessage(("Hello World!"+statusUpdate).toString().getBytes());
             	message_tmp.setQos(1);
             	message_tmp.setRetained(false);
        
