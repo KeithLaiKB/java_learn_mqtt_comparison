@@ -143,7 +143,6 @@ public class TestMain_Hivemqmqttclient_Publisher {
 
         while(statusUpdate<=statusUpdateMaxTimes-1) {
         	statusUpdate = statusUpdate+1;
-        	String str_content_tmp = "Hello World!" + statusUpdate;
         	
         	c1.payload(("Hello World!" + statusUpdate).getBytes());		// set payload
         	c1.send();									// publish
