@@ -66,9 +66,8 @@ public class TestMain_Hivemqmqttclient_Publisher {
         	statusUpdate = statusUpdate+1;
         	
         	//String str_content_tmp = "Hello World!" + statusUpdate;
-        	String str_content_tmp = "Hi!" + String.format("%07d", statusUpdate);
 
-        	c1.payload(str_content_tmp.getBytes());		// set payload
+        	c1.payload(("Hi!" + String.format("%07d", statusUpdate)).getBytes());
         	c1.send();									// publish
 
         	try {
