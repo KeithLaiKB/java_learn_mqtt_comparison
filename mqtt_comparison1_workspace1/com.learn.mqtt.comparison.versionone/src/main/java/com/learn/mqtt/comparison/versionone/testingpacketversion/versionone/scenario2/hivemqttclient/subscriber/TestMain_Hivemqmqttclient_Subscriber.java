@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.testingpacketversion.scenario2.hivemqttclient.subscriber;
+package com.learn.mqtt.comparison.versionone.testingpacketversion.versionone.scenario2.hivemqttclient.subscriber;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -36,25 +36,15 @@ import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
 
 public class TestMain_Hivemqmqttclient_Subscriber {
     
-	private int expectedNumberOfMessages 	= 30;
-	private int numberOfMessages 			= 0;
-	private String clientId     			= "JavaSample_recver";			//for testWithDifferentClients
-	
-	private boolean connected = false;
-	
+	private int expectedNumberOfMessages 			= 100;
+	private volatile int numberOfMessages 			= 0;
+
     public TestMain_Hivemqmqttclient_Subscriber() {
     	
     }
-    public TestMain_Hivemqmqttclient_Subscriber(String clientId) {
-    	this.clientId = clientId;
-    }
+
 	public static void main(String[] args) {
-		if (args.length!=0) {
-			new TestMain_Hivemqmqttclient_Subscriber(args[0]).run();
-		}
-		else {
-			new TestMain_Hivemqmqttclient_Subscriber().run();
-		}
+		new TestMain_Hivemqmqttclient_Subscriber().run();
     }
 
 	
@@ -116,7 +106,7 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username("IamPublisherOne").password("123456".getBytes()).build();									// authentication
         
         //-------------set TLS/SSL-------
-        MqttClientBuilder mqttClientBuilder = MqttClient.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier(this.clientId);
+        MqttClientBuilder mqttClientBuilder = MqttClient.builder().serverAddress(LOCALHOST_EPHEMERAL1).identifier("JavaSample_recver");
         mqttClientBuilder.sslConfig(MqttClientSslConfig.builder()
                       .keyManagerFactory(null)
                       .trustManagerFactory(tmf)		//.hostnameVerifier(hostnameVerifier)
@@ -127,24 +117,24 @@ public class TestMain_Hivemqmqttclient_Subscriber {
                           }})
                       .build());
 
-        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).addConnectedListener(new MyConnectedListener()).buildRx();
+        Mqtt5RxClient client1_rx = mqttClientBuilder.useMqttVersion5().simpleAuth(simpleAuth).buildRx();
         Mqtt5AsyncClient client1 = client1_rx.toAsync();
         // -------------------------------------------------------------------------																// set broker address
         
         Mqtt5Connect connectMessage = Mqtt5Connect.builder().cleanStart(true).simpleAuth(simpleAuth).build();
         CompletableFuture<Mqtt5ConnAck> cplfu_connect_rslt = client1.connect(connectMessage);												// subscriber connect
-        while(connected==false) {
-        	try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        
+        while(client1.getState().isConnected()==false) {
+        	//do nothing, just wait for connected
         }
+        //System.out.println("connected");
        
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
-        c1.qos(MqttQos.AT_MOST_ONCE);																				// qos setting
+
+    	c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos0 setting
+    	//c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos1 setting
+        
         c1.callback(publish -> {
         			numberOfMessages = numberOfMessages +1;
         			System.out.println(new String(publish.getPayloadAsBytes())); 
@@ -153,11 +143,13 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         
         
         while(numberOfMessages < expectedNumberOfMessages) {
+        	/*
         	try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			*/
         }
 
         client1.disconnect();
@@ -165,15 +157,5 @@ public class TestMain_Hivemqmqttclient_Subscriber {
 		
 		
 	}
-	// 我们可以通过关闭掉 docker,来调试
-	private class MyConnectedListener implements MqttClientConnectedListener {
 
-		@Override
-		public void onConnected(MqttClientConnectedContext context) {
-			// TODO Auto-generated method stub
-			//System.out.println(context.toString());			//可以发现 只有成功connect 才会显示这个, connect 不成功是不显示的(例如 docker关了)
-			connected=true;
-		}
-		
-	}
 }
