@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.testingpacketversion.versionone.scenario1.pahomqtt.subscriber;
+package com.learn.mqtt.comparison.versionone.testingpacketversion.scenario1.pahomqtt.subscriber;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

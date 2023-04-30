@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.testingpacketversion.versionone.scenario1.pahomqtt.publisher;
+package com.learn.mqtt.comparison.versionone.testingpacketversion.scenario1.pahomqtt.publisher;
 
 import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;

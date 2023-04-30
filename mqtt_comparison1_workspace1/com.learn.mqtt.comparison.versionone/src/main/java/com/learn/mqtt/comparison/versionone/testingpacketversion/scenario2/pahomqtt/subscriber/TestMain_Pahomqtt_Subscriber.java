@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.testingpacketversion.versionone.scenario2.pahomqtt.subscriber;
+package com.learn.mqtt.comparison.versionone.testingpacketversion.scenario2.pahomqtt.subscriber;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.learn.mqtt.comparison.versionone.testingpacketversion.versionone.scenario2.hivemqttclient.publisher;
+package com.learn.mqtt.comparison.versionone.testingpacketversion.scenario2.hivemqttclient.publisher;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
