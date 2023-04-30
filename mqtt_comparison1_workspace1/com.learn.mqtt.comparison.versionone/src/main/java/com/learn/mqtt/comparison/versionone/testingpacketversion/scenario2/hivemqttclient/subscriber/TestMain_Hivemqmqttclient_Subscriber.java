@@ -132,8 +132,8 @@ public class TestMain_Hivemqmqttclient_Subscriber {
         Mqtt5AsyncClient.Mqtt5SubscribeAndCallbackBuilder.Start subscribeBuilder1 = client1.subscribeWith();
         Mqtt5SubscribeAndCallbackBuilder.Start.Complete c1 = subscribeBuilder1.topicFilter("Resource1");			// topic setting
 
-    	c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos0 setting
-    	//c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos1 setting
+    	c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos0 setting
+    	//c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos1 setting
         
         c1.callback(publish -> {
         			numberOfMessages = numberOfMessages +1;

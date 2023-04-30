@@ -141,8 +141,8 @@ public class TestMain_Hivemqmqttclient_Publisher {
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");		// topic setting
 
 
-    	c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos0 setting
-    	//c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos1 setting
+    	c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos0 setting
+    	//c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos1 setting
 
         while(statusUpdate<=statusUpdateMaxTimes-1) {
         	statusUpdate = statusUpdate+1;
