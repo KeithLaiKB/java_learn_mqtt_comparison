@@ -39,7 +39,7 @@ public class TestMain_Hivemqmqttclient_Publisher {
 	private void run() {
 
         int statusUpdate		=0;
-        int statusUpdateMaxTimes=50;
+        int statusUpdateMaxTimes=1000;
 
         
         final InetSocketAddress LOCALHOST_EPHEMERAL1 = new InetSocketAddress("192.168.239.137",1883);																		// set broker address	
@@ -60,7 +60,7 @@ public class TestMain_Hivemqmqttclient_Publisher {
 		
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send<CompletableFuture<Mqtt5PublishResult>>  publishBuilder1 = client1.publishWith();
     	com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishBuilder.Send.Complete<CompletableFuture<Mqtt5PublishResult>> c1 = publishBuilder1.topic("Resource1");		// topic setting
-    	c1.qos(MqttQos.AT_MOST_ONCE);																																		// qos setting
+    	c1.qos(MqttQos.AT_LEAST_ONCE);																																		// qos setting
 
         while(statusUpdate<=statusUpdateMaxTimes-1) {
         	statusUpdate = statusUpdate+1;
