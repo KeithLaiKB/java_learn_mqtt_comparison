@@ -21,7 +21,9 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
  * &emsp;						qos 0																					</br>	
  * &emsp;						if it couldn't connect, still wait though there are something wrong during connection	</br>																							</br>
  *
- *
+ * 注意 这里的 connected 不一定正确的, 所以我们最终是不采用这种版本的, 我使用的是counting version的版本,
+ * 		对于判断是否connect, 在正确的版本中 我用了getState来保证 
+ * 			client1.getState().isConnected()
  * @author laipl
  *
  */
